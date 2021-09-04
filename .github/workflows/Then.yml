@@ -1,0 +1,17 @@
+; Get an IWebBrowserApp object for each window
+; This is done in two steps:
+; 1. Get an IDispatch object for the window
+; 2. Get the IWebBrowserApp interface
+; Check if it's the right window
+Local $pIDispatch, $oIDispatch, $hRes
+Local $pIWebBrowserApp, $oIWebBrowserApp, $hWnd
+For $i = 0 To $iWindows
+  $hRes = $i < $iWindows ? $oIShellWindows.Item( $i, $pIDispatch ) _
+                         : $oIShellWindows.FindWindowSW( Null, Null, $SWC_DESKTOP, $hWnd, $SWFO_NEEDDISPATCH, $pIDispatch )
+  If $pIDispatch Then
+    $oIDispatch = ObjCreateInterface( $pIDispatch, $sIID_IDispatch, $dtag_IDispatch )
+    $oIDispatch.QueryInterface( $tRIID_IWebBrowserApp, $pIWebBrowserApp )
+    If $pIWebBrowserApp Then
+      $oIWebBrowserApp = ObjCreateInterface( $pIWebBrowserApp, $sIID_IWebBrowserApp, $dtag_IWebBrowserApp )
+      $oIWebBrowserApp.get_HWND( $hWnd )
+      If $hWnd = $hExplorer Then ExitLoop
